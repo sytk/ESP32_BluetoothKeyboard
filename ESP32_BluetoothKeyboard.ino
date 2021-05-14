@@ -5,6 +5,10 @@ BleKeyboard bleKeyboard;
 #define N 6
 #define OVERLAP_TIME 30
 
+// スイッチ：ハードウェア上のキースイッチをさす(6このうちどれか)
+// キー：一般的なキーボードでのキー役割を指す
+
+
 int SW[N]= {16, 4, 15, 23, 22, 32};
 // char KEY_MAP[64] = {0,
 //                     'a', 'i', 'b', 'e', 'k', 'k', 'l', KEY_BACKSPACE,
@@ -21,7 +25,7 @@ char KEY_MAP[64] = {0,
                     'm', 'g', ' ', KEY_BACKSPACE, ' ', ' ', ' ', 's',
                     'y', 'z', ' ', KEY_CAPS_LOCK, ' ', ' ', ' ', 'n',
                     'r', 'p', ' ', ' ', ' ', ' ', ' ', 't',
-                    ' ', ' ', ' ', KEY_RETURN, ' ', ' ', ' ', ' ',
+                    ' ', 'd', ' ', KEY_RETURN, ' ', ' ', ' ', ' ',
                     ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'h',
                     ' ', 'b', ' ', ' ', ' ', ' ', ' ', 'w',
                     ' ', ' ', ' ', ' ', ' ', '　', ' '
@@ -34,39 +38,65 @@ void setup() {
   }
    Serial.begin( 9600 );
 }
-
-int pre_num = 0;
+// bleKeyboard.isConnected()
 void loop() {
-  if(bleKeyboard.isConnected()) {
-    int num = getSwitchState();
-    if(num != 0 && pre_num == 0){
-      if(KEY_MAP[num] < 128)
-        bleKeyboard.print(KEY_MAP[num]);
+  while(true){
+    char key = getKey();
+    if(key > 0){
+      if(key < 128)
+        bleKeyboard.print(key);
       else
-        bleKeyboard.write(KEY_MAP[num]);
+        bleKeyboard.write(key);
     }
-    Serial.println(num);
 
-    pre_num = num;
-    delay(10);
+    // Serial.println(key);
+    delay(5);
   }
 }
 
+
+char getKey(){
+  static int  pre_sw_state = 0;
+  static bool is_used_layer = false;
+  char key = 0;
+
+  int sw_state = getSwitchState();
+
+  if(sw_state >= 8 && sw_state % 8 != 0)
+    is_used_layer = true;
+
+  if(is_used_layer){
+    if(sw_state < 8 && pre_sw_state >= 8){
+        key =  KEY_MAP[pre_sw_state];
+        pre_sw_state = sw_state;
+    }
+  }
+  else{
+    if(sw_state == 0 && pre_sw_state > 0){
+      key =  KEY_MAP[pre_sw_state];
+      pre_sw_state = sw_state;
+    }
+  }
+
+  if(is_used_layer && sw_state == 0){
+    is_used_layer = false;
+    pre_sw_state = 0;
+    key = 0;
+  }
+
+  if(pre_sw_state < sw_state)
+    pre_sw_state = sw_state;
+  Serial.print(key);
+  Serial.print(' ');
+  Serial.print(sw_state);
+  Serial.print(' ');
+  Serial.println(is_used_layer);
+  return key;
+}
 int getSwitchState(){
   int num = 0;
-  static bool first_flag = true;
-
   for(int i = 0; i < N; i++){
       if(digitalRead(SW[i]) == LOW){ num += int(pow(2, i)+0.1); } //0.1足さないとintキャストが暴れる
-  }
-  if(num != 0 && first_flag){
-    first_flag = false;
-    unsigned long start_time = millis();
-    while(true){
-      num = getSwitchState();
-      if(millis() - start_time > OVERLAP_TIME) break;
-    }
-    first_flag = true;
   }
   return num;
 }
