@@ -1,0 +1,5 @@
+(sym_lib_table
+  (lib (name kbd)(type Legacy)(uri ${KIPRJMOD}/kbd.lib)(options "")(descr ""))
+  (lib (name ESP32-footprints-Shem-Lib)(type Legacy)(uri ${KIPRJMOD}/ESP32-footprints-Shem-Lib.lib)(options "")(descr ""))
+  (lib (name ESP32-DEVKITC-32D)(type Legacy)(uri ${KIPRJMOD}/ESP32-DEVKITC-32D.lib)(options "")(descr ""))
+)

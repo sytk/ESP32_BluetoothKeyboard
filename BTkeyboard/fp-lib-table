@@ -1,0 +1,6 @@
+(fp_lib_table
+  (lib (name kbd)(type KiCad)(uri ${KIPRJMOD}/kbd.pretty)(options "")(descr ""))
+  (lib (name keyswitches)(type KiCad)(uri ${KIPRJMOD}/keyswitches.pretty)(options "")(descr ""))
+  (lib (name ESP32-footprints-Lib)(type KiCad)(uri ${KIPRJMOD}/ESP32-footprints-Lib.pretty)(options "")(descr ""))
+  (lib (name ESP32-DEVKITC-32D)(type KiCad)(uri ${KIPRJMOD}/ESP32-DEVKITC-32D.pretty)(options "")(descr ""))
+)
