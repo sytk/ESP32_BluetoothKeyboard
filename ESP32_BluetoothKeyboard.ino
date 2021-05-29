@@ -28,7 +28,7 @@ char KEY_MAP[64] = {0,
                     ' ', 'd', ' ', KEY_RETURN, ' ', ' ', ' ', ' ',
                     ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'h',
                     ' ', 'b', ' ', ' ', ' ', ' ', ' ', 'w',
-                    ' ', ' ', ' ', ' ', ' ', '　', ' '
+                    KEY_F20, KEY_F21, KEY_F22, KEY_F23, KEY_F24, KEY_F18, KEY_F12
                     };
 
 void setup() {
@@ -57,15 +57,15 @@ void loop() {
 
 char getKey(){
   static int  pre_sw_state = 0;
-  static bool is_used_layer = false;
+  static bool is_using_layer = false;
   char key = 0;
 
   int sw_state = getSwitchState();
 
   if(sw_state >= 8 && sw_state % 8 != 0)
-    is_used_layer = true;
+    is_using_layer = true;
 
-  if(is_used_layer){
+  if(is_using_layer){
     if(sw_state < 8 && pre_sw_state >= 8){
         key =  KEY_MAP[pre_sw_state];
         pre_sw_state = sw_state;
@@ -78,8 +78,8 @@ char getKey(){
     }
   }
 
-  if(is_used_layer && sw_state == 0){
-    is_used_layer = false;
+  if(is_using_layer && sw_state == 0){
+    is_using_layer = false;
     pre_sw_state = 0;
     key = 0;
   }
@@ -90,7 +90,7 @@ char getKey(){
   Serial.print(' ');
   Serial.print(sw_state);
   Serial.print(' ');
-  Serial.println(is_used_layer);
+  Serial.println(is_using_layer);
   return key;
 }
 int getSwitchState(){
